@@ -1,25 +1,50 @@
-title: PowerShell script dropped to Temp
-id: dodea-sig-006-powershell-script-dropped-to-temp
+title: PowerShell Script Dropped to Temp Directory
+id: SENT-EXEC-0003
 status: experimental
-description: PowerShell script dropped to Temp
-author: adam.ring
-date: 2025-07-31 00:00:00+00:00
-tags:
-- attack.execution
-- attack.t1059.001
-- ckc.installation
+description: Detects PowerShell creating or dropping script files into a user or system temporary directory, which may indicate staged execution, payload delivery, or script-based malware activity.
+author: Adam Ring
+date: 2025-07-31
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
 logsource:
   product: windows
   category: file_event
-detection:
-  selection:
-    query: DeviceFileEvents | where FolderPath has @"AppData\Local\Temp" | where FileName
-      has_any (".ps1", ".psm1") | where InitiatingProcessFileName =~ "powershell.exe"
-  condition: selection
-falsepositives: null
-level: high
+query: |
+  DeviceFileEvents
+  | where FolderPath has @"AppData\Local\Temp"
+  | where FileName endswith ".ps1" or FileName endswith ".psm1"
+  | where InitiatingProcessFileName =~ "powershell.exe"
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, FileName, FolderPath
+severity: high
+risk_score: 70
 tactics:
-- execution
+  - Execution
 techniques:
-- t1059.001
+  - T1059.001
+kill_chain_phases:
+  - Execution
+data_sources:
+  - DeviceFileEvents
+falsepositives:
+  - Administrative scripts written to temp during troubleshooting or automation
+  - Software packaging or update workflows that stage PowerShell modules in temp paths
+triage:
+  - Review the full temp file path and filename for suspicious naming patterns
+  - Identify the creating PowerShell process and associated user context
+  - Determine whether the script was subsequently executed
+  - Review related process, file, and network activity on the same host
+validation:
+  - Test by writing benign PowerShell scripts to a temp directory from PowerShell
+  - Validate whether common administrative tooling generates expected benign hits
+  - Confirm the analytic captures useful file path and account context
 lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - ckc.execution
+  - powershell
+  - temp-directory
+  - script-drop
+  - sentinel
