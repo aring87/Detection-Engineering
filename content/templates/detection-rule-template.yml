@@ -1,0 +1,42 @@
+title: Suspicious PowerShell Encoded Command Execution
+id: SENT-EXEC-0001
+status: stable
+description: Detects PowerShell execution with encoded commands that may indicate obfuscation or malicious script execution.
+author: Your Name
+date: 2026-03-06
+modified: 2026-03-06
+logsource:
+  product: windows
+  service: powershell
+platform: microsoft_sentinel
+query_language: kql
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("powershell.exe","pwsh.exe")
+  | where ProcessCommandLine has_any ("-enc","-encodedcommand")
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine
+severity: medium
+risk_score: 50
+tactics:
+  - Execution
+techniques:
+  - T1059.001
+kill_chain_phases:
+  - Execution
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Administrative automation using encoded commands
+triage:
+  - Review parent and child process relationships
+  - Decode the command if present
+validation:
+  - Test with Atomic Red Team PowerShell encoded command simulation
+lifecycle: testing
+owner: Detection Engineering
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - ckc.execution
+  - powershell
+  - sentinel

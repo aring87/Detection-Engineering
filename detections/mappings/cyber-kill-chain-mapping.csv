@@ -1,0 +1,2 @@
+detection_id,title,kill_chain_phase
+SENT-EXEC-0001,Suspicious PowerShell Encoded Command Execution,Execution

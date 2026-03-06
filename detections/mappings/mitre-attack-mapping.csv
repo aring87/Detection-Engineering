@@ -1,0 +1,2 @@
+detection_id,title,tactic,technique
+SENT-EXEC-0001,Suspicious PowerShell Encoded Command Execution,Execution,T1059.001

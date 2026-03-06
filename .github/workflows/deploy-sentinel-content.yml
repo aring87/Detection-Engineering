@@ -1,0 +1,13 @@
+name: Deploy Sentinel Content
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Placeholder deployment step
+        run: echo "Add Sentinel deployment workflow here"
