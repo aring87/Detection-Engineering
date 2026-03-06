@@ -1,0 +1,27 @@
+title: Vulnerability Scanning Detected
+id: dodea-sig-001-vulnerability-scannining-detection
+status: experimental
+description: Detects usage of known vulnerability scanning tools
+author: Adam Ring
+date: '2025-07-31'
+tags:
+- attack.reconnaissance
+- attack.t1595.002
+- ckc.reconnaissance
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    query: DeviceNetworkEvents| where InitiatingProcessFileName has_any ("nmap.exe",
+      "nessus.exe", "openvas", "qualys")| project TimeGenerated, DeviceName, InitiatingProcessFileName,
+      RemoteIP
+  condition: selection
+falsepositives:
+- None known
+level: medium
+tactics:
+- reconnaissance
+techniques:
+- t1595.002
+lifecycle: experimental

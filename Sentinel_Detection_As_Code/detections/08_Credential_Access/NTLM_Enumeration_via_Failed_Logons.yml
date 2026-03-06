@@ -1,0 +1,32 @@
+title: NTLM Enumeration via Failed Logons
+id: dodea-sig-012-ntlm-enumeration-via-failed-logons
+status: experimental
+description: NTLM Enumeration via Failed Logons
+author: adam.ring
+date: 2025-07-31 00:00:00+00:00
+tags:
+  - attack.credential_access
+  - attack.t1110.003
+  - ckc
+  - ckc.delivery
+logsource:
+  product: windows
+  category: logon
+detection:
+  selection:
+    query: >-
+      DeviceLogonEvents | where Protocol =~ "NTLM"
+
+      | where ActionType =~ "LogonFailed"
+
+      | summarize Attempts = count(), DistinctAccounts = dcount(AccountName) by DeviceName, RemoteIP, bin(TimeGenerated, 10m)
+
+      | where Attempts > 10
+  condition: selection
+falsepositives: null
+level: high
+tactics:
+  - credential_access
+techniques:
+  - t1110.003
+lifecycle: experimental

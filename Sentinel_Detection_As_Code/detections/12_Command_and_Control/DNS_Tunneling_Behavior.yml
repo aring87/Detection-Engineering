@@ -1,0 +1,26 @@
+title: DNS tunneling behavior
+id: dodea-sig-019-dns-tunneling-behavior
+status: experimental
+description: DNS tunneling behavior
+author: adam.ring
+date: 2025-07-31 00:00:00+00:00
+tags:
+  - attack.command_and_control
+  - attack.t1071.004
+  - ckc
+  - ckc.command-and-control
+logsource:
+  product: windows
+  category: dns_query
+detection:
+  selection:
+    query: DnsEvents | where Name has_any (".xyz", ".pw", ".club", ".info") |
+      summarize count() by Name, bin(TimeGenerated, 5m) | where count_ > 100
+  condition: selection
+falsepositives: null
+level: high
+tactics:
+  - command_and_control
+techniques:
+  - t1071.004
+lifecycle: experimental
