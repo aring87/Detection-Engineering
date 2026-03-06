@@ -1,0 +1,45 @@
+title: Service Binary Path Hijack
+id: SENT-PERS-0003
+status: experimental
+description: Detects suspicious service creation or configuration changes that set a service image path to uncommon or user-writable locations.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("sc.exe","powershell.exe")
+  | where ProcessCommandLine has_any ("create","config","New-Service","Set-Service")
+  | where ProcessCommandLine has_any ("AppData","Temp","ProgramData")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 75
+tactics:
+  - Persistence
+  - Privilege Escalation
+techniques:
+  - T1543.003
+kill_chain_phases:
+  - Persistence
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved service testing or troubleshooting
+  - Internal application deployment to nonstandard paths
+triage:
+  - Inspect the target service and binary path
+  - Determine whether the path is user-writable or unsigned
+  - Check for recent file drops and service start activity
+validation:
+  - Create or reconfigure a lab service to point to a nonstandard path
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.persistence
+  - attack.privilege-escalation
+  - sentinel
+  - persistence

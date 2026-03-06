@@ -1,0 +1,44 @@
+title: System and Network Configuration Discovery
+id: SENT-DISC-0002
+status: experimental
+description: Detects common commands used to gather host, network, and interface information in a short burst.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("ipconfig.exe","arp.exe","route.exe","systeminfo.exe","netstat.exe")
+  | summarize CommandCount=count(), Commands=make_set(ProcessCommandLine, 10) by DeviceName, AccountName, bin(Timestamp, 10m)
+  | where CommandCount >= 4
+severity: medium
+risk_score: 50
+tactics:
+  - Discovery
+techniques:
+  - T1016
+  - T1082
+  - T1049
+kill_chain_phases:
+  - Discovery
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Troubleshooting by support teams
+  - Asset inventory or diagnostics tooling
+triage:
+  - Inspect the burst of discovery commands and the operator account
+  - Determine whether the host is a workstation or admin jump box
+  - Review follow-on remote execution or staging activity
+validation:
+  - Run multiple discovery commands within ten minutes in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.discovery
+  - sentinel
+  - discovery

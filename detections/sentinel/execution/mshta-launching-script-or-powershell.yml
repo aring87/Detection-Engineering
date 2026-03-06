@@ -1,0 +1,44 @@
+title: MSHTA Launching Script or PowerShell
+id: SENT-EXEC-0002
+status: experimental
+description: Detects mshta.exe launching script interpreters or containing suspicious inline script or PowerShell indicators.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName =~ "mshta.exe"
+  | where ProcessCommandLine has_any ("powershell","vbscript:","javascript:","http://","https://")
+  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 70
+tactics:
+  - Execution
+  - Defense Evasion
+techniques:
+  - T1218.005
+kill_chain_phases:
+  - Execution
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Legacy administrative or application compatibility workflows
+  - Internal HTA-based tooling
+triage:
+  - Inspect the HTA source and any embedded URLs
+  - Review parent and child processes
+  - Determine whether mshta usage is normal for the device
+validation:
+  - Launch a test HTA from mshta.exe in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.execution
+  - attack.defense-evasion
+  - sentinel
+  - execution

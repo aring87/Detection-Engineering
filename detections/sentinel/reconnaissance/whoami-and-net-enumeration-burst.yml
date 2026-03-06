@@ -1,0 +1,47 @@
+title: Whoami and Net Enumeration Burst
+id: SENT-RECON-0002
+status: experimental
+description: Detects bursts of account and domain enumeration commands often used during host or domain reconnaissance.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("whoami.exe","net.exe","nltest.exe","dsquery.exe")
+  | summarize CommandCount=count(), Commands=make_set(ProcessCommandLine, 10) by DeviceName, AccountName, bin(Timestamp, 10m)
+  | where CommandCount >= 5
+severity: medium
+risk_score: 50
+tactics:
+  - Reconnaissance
+  - Discovery
+techniques:
+  - T1087
+  - T1016
+  - T1482
+kill_chain_phases:
+  - Reconnaissance
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Administrator troubleshooting or domain support activity
+  - Automated inventory or audit scripts
+triage:
+  - Review the exact commands executed in the burst
+  - Determine whether the account is expected to perform domain reconnaissance
+  - Look for subsequent lateral movement or credential access activity
+validation:
+  - Run multiple whoami, net, and nltest commands within 10 minutes
+  - Compare against known benign administrator activity
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.reconnaissance
+  - attack.discovery
+  - sentinel
+  - reconnaissance

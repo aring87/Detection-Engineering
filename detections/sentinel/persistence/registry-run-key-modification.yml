@@ -1,0 +1,46 @@
+title: Registry Run Key Modification
+id: SENT-PERS-0001
+status: experimental
+description: Detects creation or modification of common autorun registry keys used for persistence.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: registry_event
+query: |
+  DeviceRegistryEvents
+  | where RegistryKey has_any (
+      @"\Software\Microsoft\Windows\CurrentVersion\Run",
+      @"\Software\Microsoft\Windows\CurrentVersion\RunOnce",
+      @"\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run")
+  | where ActionType in~ ("RegistryValueSet","RegistryKeyCreated")
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RegistryKey, RegistryValueData
+severity: high
+risk_score: 70
+tactics:
+  - Persistence
+techniques:
+  - T1547.001
+kill_chain_phases:
+  - Persistence
+data_sources:
+  - DeviceRegistryEvents
+falsepositives:
+  - Legitimate software installers or updaters
+  - Authorized enterprise startup configuration changes
+triage:
+  - Review the written value and executable path
+  - Determine whether the initiating process is expected
+  - Check for associated file writes or scheduled task creation
+validation:
+  - Set a benign Run key in a lab and confirm the event triggers
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.persistence
+  - attack.t1547.001
+  - sentinel
+  - persistence

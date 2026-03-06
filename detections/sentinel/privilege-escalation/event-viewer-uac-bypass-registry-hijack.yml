@@ -1,0 +1,44 @@
+title: Event Viewer UAC Bypass Registry Hijack
+id: SENT-PRIVESC-0001
+status: experimental
+description: Detects registry hijack patterns associated with the Event Viewer UAC bypass technique.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: registry_event
+query: |
+  DeviceRegistryEvents
+  | where RegistryKey has @"\Software\Classes\mscfile\shell\open\command"
+  | where ActionType in~ ("RegistryValueSet","RegistryKeyCreated")
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RegistryKey, RegistryValueData
+severity: high
+risk_score: 80
+tactics:
+  - Privilege Escalation
+  - Defense Evasion
+techniques:
+  - T1548.002
+kill_chain_phases:
+  - Privilege Escalation
+data_sources:
+  - DeviceRegistryEvents
+falsepositives:
+  - Rare troubleshooting or software repair actions
+  - Authorized UAC research in a lab
+triage:
+  - Review the command registered under the hijacked key
+  - Determine whether the write was user initiated or scripted
+  - Check for subsequent mmc.exe or eventvwr.exe launches
+validation:
+  - Write the registry key in a lab and confirm telemetry coverage
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.privilege-escalation
+  - attack.defense-evasion
+  - sentinel
+  - privilege-escalation

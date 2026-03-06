@@ -1,0 +1,43 @@
+title: Security Tool Disable Attempt
+id: SENT-DEFEV-0002
+status: experimental
+description: Detects attempts to stop security services or alter Windows Defender settings and exclusions.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("powershell.exe","cmd.exe","sc.exe","net.exe","reg.exe")
+  | where ProcessCommandLine has_any ("Set-MpPreference","DisableRealtimeMonitoring","Add-MpPreference"," stop "," config "," WinDefend "," Sense ")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 82
+tactics:
+  - Defense Evasion
+techniques:
+  - T1562.001
+kill_chain_phases:
+  - Defense Evasion
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Planned security maintenance
+  - Approved Defender policy changes by security administrators
+triage:
+  - Identify the security control targeted and the user or process
+  - Review whether the activity aligns with maintenance windows
+  - Inspect for malware execution or staging after the change
+validation:
+  - Run benign Defender configuration changes in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.defense-evasion
+  - attack.t1562.001
+  - sentinel
+  - defense-evasion

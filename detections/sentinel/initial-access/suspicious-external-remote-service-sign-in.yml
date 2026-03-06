@@ -1,0 +1,43 @@
+title: Suspicious External Remote Service Sign-In
+id: SENT-INIT-0002
+status: experimental
+description: Detects successful external sign-ins to remote access or administrative services that may represent abuse of external remote services.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: azure
+  category: authentication
+query: |
+  SigninLogs
+  | where ResultType == 0
+  | where IPAddress !startswith "10." and IPAddress !startswith "192.168."
+  | where AppDisplayName has_any ("Azure Portal","Windows Sign In","VPN","Remote Desktop")
+  | project TimeGenerated, UserPrincipalName, IPAddress, AppDisplayName, Location, ConditionalAccessStatus
+severity: high
+risk_score: 70
+tactics:
+  - Initial Access
+techniques:
+  - T1133
+kill_chain_phases:
+  - Initial Access
+data_sources:
+  - SigninLogs
+falsepositives:
+  - Authorized travel or remote administration
+  - Known VPN gateways or managed remote services
+triage:
+  - Review location, device, and identity risk context
+  - Compare to the user's baseline sign-in patterns
+  - Correlate with endpoint remote access events
+validation:
+  - Validate against known remote access scenarios in your environment
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.initial-access
+  - sentinel
+  - initial-access

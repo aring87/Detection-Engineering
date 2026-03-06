@@ -1,0 +1,43 @@
+title: Remote Service Creation
+id: SENT-LAT-0001
+status: experimental
+description: Detects service control commands commonly used to execute code on remote systems.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("sc.exe","psexec.exe","cmd.exe")
+  | where ProcessCommandLine has_any ("\\"," create "," start ")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 80
+tactics:
+  - Lateral Movement
+techniques:
+  - T1021.002
+  - T1569.002
+kill_chain_phases:
+  - Lateral Movement
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Authorized remote administration
+  - Software deployment systems
+triage:
+  - Identify the remote target and binary path
+  - Validate whether the action was part of administration
+  - Check for credential access or remote file copy events
+validation:
+  - Use sc.exe against a lab remote system to create a benign service
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.lateral-movement
+  - sentinel
+  - lateral-movement

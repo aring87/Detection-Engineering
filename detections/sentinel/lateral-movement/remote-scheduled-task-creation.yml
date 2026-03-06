@@ -1,0 +1,43 @@
+title: Remote Scheduled Task Creation
+id: SENT-LAT-0002
+status: experimental
+description: Detects schtasks-based remote task creation that may indicate lateral movement or remote execution.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName =~ "schtasks.exe"
+  | where ProcessCommandLine has_all ("/create","/s")
+  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 75
+tactics:
+  - Lateral Movement
+techniques:
+  - T1053.005
+  - T1021
+kill_chain_phases:
+  - Lateral Movement
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved admin orchestration
+  - Enterprise job scheduling
+triage:
+  - Review the target host, task name, and command
+  - Determine whether remote task creation is normal for the account
+  - Inspect remote logons and service creation nearby
+validation:
+  - Create a remote scheduled task in a controlled lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.lateral-movement
+  - sentinel
+  - lateral-movement

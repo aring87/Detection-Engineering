@@ -1,0 +1,44 @@
+title: Suspicious Azure AD Application Registration
+id: SENT-RESDEV-0001
+status: experimental
+description: Detects creation of Azure AD or Entra ID application registrations that may support malicious resource development or persistence.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: azure
+  category: audit
+query: |
+  AuditLogs
+  | where OperationName has_any ("Add application","Add service principal","Update application")
+  | extend InitiatedByUPN=tostring(parse_json(InitiatedBy).user.userPrincipalName)
+  | project TimeGenerated, OperationName, Result, InitiatedByUPN, TargetResources
+severity: high
+risk_score: 70
+tactics:
+  - Resource Development
+  - Persistence
+techniques:
+  - T1583.006
+kill_chain_phases:
+  - Resource Development
+data_sources:
+  - AuditLogs
+falsepositives:
+  - Approved application onboarding
+  - Legitimate cloud engineering or identity administration
+triage:
+  - Review the application name, owner, credentials, and permissions
+  - Determine whether the initiator normally registers applications
+  - Inspect follow-on service principal or consent activity
+validation:
+  - Register a lab application and confirm the analytic triggers
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.resource-development
+  - attack.persistence
+  - sentinel
+  - resource-development

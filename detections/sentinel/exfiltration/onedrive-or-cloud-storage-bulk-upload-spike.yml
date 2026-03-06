@@ -1,0 +1,42 @@
+title: OneDrive or Cloud Storage Bulk Upload Spike
+id: SENT-EXFIL-0003
+status: experimental
+description: Detects spikes in cloud storage upload activity that may indicate data exfiltration to sanctioned services.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: cloud
+  category: file_transfer
+query: |
+  CloudAppEvents
+  | where ActionType has_any ("FileUploadedToCloud","FileSyncUploadedFull","FileUploaded")
+  | summarize Uploads=count(), FileCount=dcount(ObjectName) by AccountObjectId, Application, bin(Timestamp, 30m)
+  | where Uploads >= 50 and FileCount >= 25
+severity: medium
+risk_score: 65
+tactics:
+  - Exfiltration
+techniques:
+  - T1567.002
+kill_chain_phases:
+  - Exfiltration
+data_sources:
+  - CloudAppEvents
+falsepositives:
+  - Legitimate large-scale file sync or migration activity
+  - Bulk collaboration uploads during business processes
+triage:
+  - Review the user, application, and upload volume
+  - Determine whether the destination tenant or workspace is expected
+  - Look for preceding archive creation or collection events
+validation:
+  - Upload multiple benign files to a test cloud storage account
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.exfiltration
+  - sentinel
+  - exfiltration

@@ -1,25 +1,43 @@
 title: Clipboard Data Collection
-id: dodea-sig-032-clipboard-data-collection
+id: SENT-COLL-0001
 status: experimental
-description: Detects use of tools accessing clipboard data.
+description: Detects PowerShell or command-line usage that reads or manipulates clipboard contents, which may indicate collection of copied data or credentials.
 author: Adam Ring
-date: '2025-08-07'
-tags:
-- attack.collection
-- attack.t1115
-- ckc.actions-on-objectives
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
 logsource:
   product: windows
   category: process_creation
-detection:
-  selection:
-    query: DeviceProcessEvents | where ProcessCommandLine has_any ('clip', 'Get-Clipboard')
-  condition: selection
-falsepositives:
-- None known
-level: medium
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("powershell.exe","pwsh.exe","cmd.exe")
+  | where ProcessCommandLine has_any ("Get-Clipboard","Set-Clipboard","clip.exe")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: medium
+risk_score: 60
 tactics:
-- collection
+  - Collection
 techniques:
-- t1115
+  - T1115
+kill_chain_phases:
+  - Collection
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Benign clipboard scripting or user automation
+  - Support workflows that sanitize clipboard content
+triage:
+  - Review why clipboard access was needed on the host
+  - Determine whether the user was performing routine admin work
+  - Check for concurrent archiving or exfiltration activity
+validation:
+  - Run Get-Clipboard in a lab PowerShell session
 lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.collection
+  - attack.t1115
+  - sentinel
+  - collection

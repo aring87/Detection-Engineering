@@ -1,0 +1,43 @@
+title: LDAP Enumeration Using PowerShell
+id: SENT-DISC-0003
+status: experimental
+description: Detects PowerShell commands that invoke Active Directory or LDAP enumeration patterns.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("powershell.exe","pwsh.exe")
+  | where ProcessCommandLine has_any ("Get-ADUser","Get-ADComputer","Get-ADGroup","DirectorySearcher","LDAP://","ADSISearcher")
+  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 68
+tactics:
+  - Discovery
+techniques:
+  - T1087.002
+  - T1018
+kill_chain_phases:
+  - Discovery
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved AD administration and support work
+  - Identity inventory scripts
+triage:
+  - Review the AD objects queried and host context
+  - Determine whether the system is used for administration
+  - Check for privilege escalation or lateral movement afterward
+validation:
+  - Run benign AD PowerShell queries in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.discovery
+  - sentinel
+  - discovery

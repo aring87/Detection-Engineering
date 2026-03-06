@@ -1,0 +1,45 @@
+title: PowerShell or LOLBin External Network Traffic
+id: SENT-C2-0002
+status: experimental
+description: Detects outbound network connections from PowerShell and common LOLBins to external destinations.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: network
+query: |
+  DeviceNetworkEvents
+  | where InitiatingProcessFileName in~ ("powershell.exe","pwsh.exe","mshta.exe","rundll32.exe","regsvr32.exe","certutil.exe")
+  | where not(RemoteIP startswith "10." or RemoteIP startswith "192.168." or RemoteIP startswith "172.16.")
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RemoteIP, RemotePort, RemoteUrl
+severity: high
+risk_score: 72
+tactics:
+  - Command and Control
+  - Execution
+techniques:
+  - T1105
+  - T1218
+kill_chain_phases:
+  - Command and Control
+data_sources:
+  - DeviceNetworkEvents
+falsepositives:
+  - Approved automation that retrieves external content
+  - Security tools or scripts contacting public services
+triage:
+  - Validate whether the process normally makes external connections
+  - Review associated command line and parent process
+  - Inspect for downloads, beacons, or script execution nearby
+validation:
+  - Perform a benign web request from PowerShell in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.command-and-control
+  - attack.execution
+  - sentinel
+  - command-and-control

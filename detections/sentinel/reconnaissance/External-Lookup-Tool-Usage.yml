@@ -1,25 +1,43 @@
 title: External Lookup Tool Usage
-id: dodea-sig-002-external-lookup-tool-usage
+id: SENT-RECON-0003
 status: experimental
-description: Detects usage of tools like nslookup, whois, dig that indicate external reconnaissance.
+description: Detects DNS and WHOIS lookup utilities that may be used for reconnaissance against external infrastructure.
 author: Adam Ring
-date: '2025-08-07'
-tags:
-- attack.reconnaissance
-- attack.t1596
-- ckc.reconnaissance
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
 logsource:
   product: windows
   category: process_creation
-detection:
-  selection:
-    query: DeviceProcessEvents | where FileName in~ ('nslookup.exe', 'whois.exe', 'dig.exe')
-  condition: selection
-falsepositives:
-- None known
-level: medium
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("nslookup.exe","whois.exe","dig.exe")
+  | where ProcessCommandLine has_any ("-type=","/querytype","mx","txt","soa","ns")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: low
+risk_score: 40
 tactics:
-- reconnaissance
+  - Reconnaissance
 techniques:
-- t1596
+  - T1590
+  - T1596
+kill_chain_phases:
+  - Reconnaissance
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Legitimate DNS troubleshooting
+  - Helpdesk or network operations lookups
+triage:
+  - Review queried domains and record types
+  - Determine whether usage aligns with admin duties
+  - Check for nearby phishing preparation or scanning
+validation:
+  - Run nslookup or dig queries for MX, TXT, or SOA records
 lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.reconnaissance
+  - sentinel
+  - reconnaissance

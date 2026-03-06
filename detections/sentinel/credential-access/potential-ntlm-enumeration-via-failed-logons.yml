@@ -1,0 +1,45 @@
+title: Potential NTLM Enumeration via Failed Logons
+id: SENT-CRED-0001
+status: experimental
+description: Detects spikes in failed NTLM authentication attempts that may indicate account enumeration or password spraying.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: authentication
+query: |
+  IdentityLogonEvents
+  | where Protocol =~ "NTLM" and ActionType =~ "LogonFailed"
+  | summarize Failures=count(), Accounts=dcount(AccountUpn) by DeviceName, IPAddress, bin(Timestamp, 15m)
+  | where Failures >= 50 and Accounts >= 10
+severity: high
+risk_score: 78
+tactics:
+  - Credential Access
+  - Reconnaissance
+techniques:
+  - T1110.003
+  - T1087
+kill_chain_phases:
+  - Credential Access
+data_sources:
+  - IdentityLogonEvents
+falsepositives:
+  - Misconfigured services or stale credentials
+  - Password spray simulations in authorized testing
+triage:
+  - Review the source IP and targeted accounts
+  - Determine whether the source host is compromised or misconfigured
+  - Check for successful logons after the failed attempts
+validation:
+  - Replay representative NTLM failure telemetry or simulate spray in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.credential-access
+  - attack.reconnaissance
+  - sentinel
+  - credential-access

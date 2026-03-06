@@ -1,0 +1,44 @@
+title: Suspicious Service Creation for Elevation
+id: SENT-PRIVESC-0003
+status: experimental
+description: Detects service creation commands that may be used to execute code with SYSTEM privileges.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("sc.exe","cmd.exe","powershell.exe")
+  | where ProcessCommandLine has_any (" create ","New-Service","binPath=")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 70
+tactics:
+  - Privilege Escalation
+  - Persistence
+techniques:
+  - T1543.003
+kill_chain_phases:
+  - Privilege Escalation
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Legitimate service deployments by administrators
+  - Software installation workflows
+triage:
+  - Review the service name, path, and binary
+  - Determine whether the user should be creating services
+  - Correlate with service start and file creation events
+validation:
+  - Create a benign lab service and validate the command is captured
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.privilege-escalation
+  - attack.persistence
+  - sentinel
+  - privilege-escalation

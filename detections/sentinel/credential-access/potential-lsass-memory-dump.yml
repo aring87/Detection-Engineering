@@ -1,0 +1,42 @@
+title: Potential LSASS Memory Dump
+id: SENT-CRED-0002
+status: experimental
+description: Detects common LSASS dumping tools and command lines used to extract credentials from memory.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where ProcessCommandLine has_any ("lsass","MiniDumpWriteDump","comsvcs.dll, MiniDump","procdump","sekurlsa")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 85
+tactics:
+  - Credential Access
+techniques:
+  - T1003.001
+kill_chain_phases:
+  - Credential Access
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved memory forensics or EDR actions
+  - Authorized security testing
+triage:
+  - Identify the dumping utility and target process
+  - Check whether a dump file was written to disk
+  - Correlate with privilege escalation or lateral movement
+validation:
+  - Run a lab-only LSASS dump simulation and confirm telemetry
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.credential-access
+  - attack.t1003.001
+  - sentinel
+  - credential-access

@@ -1,0 +1,42 @@
+title: Suspicious Token Manipulation or SeDebug Use
+id: SENT-PRIVESC-0002
+status: experimental
+description: Detects tools or command lines commonly associated with token theft or elevation attempts on endpoints.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where ProcessCommandLine has_any ("SeDebugPrivilege","DuplicateToken","CreateProcessWithTokenW","Incognito","getsystem")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 78
+tactics:
+  - Privilege Escalation
+techniques:
+  - T1134
+  - T1068
+kill_chain_phases:
+  - Privilege Escalation
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved red team or lab activity
+  - Security tool strings in research environments
+triage:
+  - Identify the tool and process ancestry
+  - Review integrity level changes or token operations
+  - Check for LSASS access or service abuse nearby
+validation:
+  - Replay representative telemetry or lab-generated test events
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.privilege-escalation
+  - sentinel
+  - privilege-escalation

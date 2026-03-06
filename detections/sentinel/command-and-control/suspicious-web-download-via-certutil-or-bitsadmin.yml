@@ -1,0 +1,44 @@
+title: Suspicious Web Download via Certutil or Bitsadmin
+id: SENT-C2-0003
+status: experimental
+description: Detects built-in Windows utilities downloading remote content, a common pattern for staging command-and-control tools or payloads.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("certutil.exe","bitsadmin.exe")
+  | where ProcessCommandLine has_any ("http://","https://","/transfer","-urlcache")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 75
+tactics:
+  - Command and Control
+  - Execution
+techniques:
+  - T1105
+kill_chain_phases:
+  - Command and Control
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved software distribution or update tasks
+  - Administrator troubleshooting downloads
+triage:
+  - Review the remote URL and downloaded file path
+  - Determine whether the command is part of approved admin workflow
+  - Check for subsequent execution from the download location
+validation:
+  - Use certutil or bitsadmin to download a benign file in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.command-and-control
+  - attack.execution
+  - sentinel
+  - command-and-control

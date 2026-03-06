@@ -1,0 +1,43 @@
+title: PowerShell Email Exfiltration with Attachments
+id: SENT-EXFIL-0001
+status: experimental
+description: Detects PowerShell commands that reference SMTP or mail libraries and file attachments, which may indicate scripted exfiltration.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("powershell.exe","pwsh.exe")
+  | where ProcessCommandLine has_any ("Send-MailMessage","SmtpClient","-Attachments","smtp")
+  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+severity: high
+risk_score: 80
+tactics:
+  - Exfiltration
+techniques:
+  - T1020
+  - T1048
+kill_chain_phases:
+  - Exfiltration
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved scripted alerting or email notifications
+  - Legacy automation using Send-MailMessage
+triage:
+  - Review the recipients, attachments, and script source
+  - Determine whether the script is approved
+  - Check for staging or archive creation before the email activity
+validation:
+  - Run a benign test script that references Send-MailMessage or SMTP
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.exfiltration
+  - sentinel
+  - exfiltration

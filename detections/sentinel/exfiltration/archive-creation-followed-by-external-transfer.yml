@@ -1,0 +1,45 @@
+title: Archive Creation Followed by External Transfer
+id: SENT-EXFIL-0002
+status: experimental
+description: Detects archive creation in user paths that may support data staging for exfiltration.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: file_event
+query: |
+  DeviceFileEvents
+  | where FileName endswith ".zip" or FileName endswith ".7z" or FileName endswith ".rar"
+  | where FolderPath has_any ("\Users\","\Desktop\","\Documents\","\Downloads\")
+  | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, FileName, FolderPath
+severity: high
+risk_score: 78
+tactics:
+  - Collection
+  - Exfiltration
+techniques:
+  - T1560
+  - T1048
+kill_chain_phases:
+  - Exfiltration
+data_sources:
+  - DeviceFileEvents
+falsepositives:
+  - Legitimate user archiving or software packaging
+  - Backup or transfer preparation tasks
+triage:
+  - Inspect what files were archived and by which process
+  - Correlate with outbound network traffic afterward
+  - Determine whether the user regularly creates archives in these paths
+validation:
+  - Create a benign archive in user data paths and verify event capture
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.collection
+  - attack.exfiltration
+  - sentinel
+  - exfiltration

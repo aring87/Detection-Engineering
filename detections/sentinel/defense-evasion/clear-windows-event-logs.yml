@@ -1,0 +1,43 @@
+title: Clear Windows Event Logs
+id: SENT-DEFEV-0003
+status: experimental
+description: Detects commands used to clear Windows event logs in an effort to remove evidence.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("wevtutil.exe","powershell.exe","cmd.exe")
+  | where ProcessCommandLine has_any (" cl ","Clear-EventLog","Remove-EventLog")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 75
+tactics:
+  - Defense Evasion
+techniques:
+  - T1070.001
+kill_chain_phases:
+  - Defense Evasion
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Rare admin log maintenance
+  - Lab validation or forensic cleanup exercises
+triage:
+  - Review which logs were cleared and by whom
+  - Validate whether the actor is an approved administrator
+  - Check for suspicious activity immediately before the clear command
+validation:
+  - Clear a noncritical lab event log and confirm the analytic triggers
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.defense-evasion
+  - attack.t1070.001
+  - sentinel
+  - defense-evasion

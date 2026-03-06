@@ -1,0 +1,45 @@
+title: Potential Spearphishing Attachment Execution
+id: SENT-INIT-0003
+status: experimental
+description: Detects Office applications spawning script interpreters or LOLBins shortly after opening files from user download or temp paths.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where InitiatingProcessFileName in~ ("winword.exe","excel.exe","powerpnt.exe","outlook.exe")
+  | where FileName in~ ("powershell.exe","cmd.exe","mshta.exe","wscript.exe","cscript.exe","rundll32.exe")
+  | where InitiatingProcessFolderPath has_any ("Downloads","AppData\Local\Temp","INetCache")
+  | project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine, InitiatingProcessFolderPath
+severity: high
+risk_score: 80
+tactics:
+  - Initial Access
+  - Execution
+techniques:
+  - T1566.001
+kill_chain_phases:
+  - Initial Access
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Approved macro-enabled business workflows
+  - Internal automation launched through Office
+triage:
+  - Review the parent Office process and opened document path
+  - Check for child processes, network connections, or macro activity
+  - Investigate the source email or downloaded file
+validation:
+  - Open a benign macro-enabled test document in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.initial-access
+  - attack.execution
+  - sentinel
+  - initial-access

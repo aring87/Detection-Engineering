@@ -1,0 +1,44 @@
+title: WMI Remote Process Execution
+id: SENT-LAT-0003
+status: experimental
+description: Detects use of WMIC or PowerShell WMI calls to spawn processes on remote systems.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: process_creation
+query: |
+  DeviceProcessEvents
+  | where FileName in~ ("wmic.exe","powershell.exe")
+  | where ProcessCommandLine has_any ("process call create","Invoke-WmiMethod","Win32_Process","-ComputerName")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine
+severity: high
+risk_score: 78
+tactics:
+  - Lateral Movement
+  - Execution
+techniques:
+  - T1047
+kill_chain_phases:
+  - Lateral Movement
+data_sources:
+  - DeviceProcessEvents
+falsepositives:
+  - Systems management and admin automation
+  - Remote inventory or patching activity
+triage:
+  - Review the target host and command executed remotely
+  - Determine whether WMI is commonly used by administrators
+  - Correlate with remote logon and file copy activity
+validation:
+  - Run benign remote WMI process creation in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.lateral-movement
+  - attack.execution
+  - sentinel
+  - lateral-movement

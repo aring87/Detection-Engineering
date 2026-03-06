@@ -1,0 +1,43 @@
+title: Mass File Enumeration in User Data Paths
+id: SENT-COLL-0002
+status: experimental
+description: Detects processes enumerating many files in user data paths, which can indicate staging for collection.
+author: Adam Ring
+date: 2026-03-06
+modified: 2026-03-06
+platform: microsoft_sentinel
+query_language: kql
+logsource:
+  product: windows
+  category: file_event
+query: |
+  DeviceFileEvents
+  | where FolderPath has_any ("\Users\","\Desktop\","\Documents\","\Downloads\")
+  | summarize FileTouches=count(), Paths=dcount(FolderPath) by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(Timestamp, 15m)
+  | where FileTouches >= 200 and Paths >= 3
+severity: medium
+risk_score: 58
+tactics:
+  - Collection
+techniques:
+  - T1005
+  - T1039
+kill_chain_phases:
+  - Collection
+data_sources:
+  - DeviceFileEvents
+falsepositives:
+  - Backup, indexing, or anti-malware scanning
+  - Bulk file management by IT administrators
+triage:
+  - Identify the process touching large numbers of files
+  - Determine whether normal tooling explains the volume
+  - Review for compression or outbound transfer soon after
+validation:
+  - Use a benign script to recurse through user folders in a lab
+lifecycle: experimental
+owner: Detection Engineering
+tags:
+  - attack.collection
+  - sentinel
+  - collection
