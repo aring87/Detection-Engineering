@@ -335,4 +335,4 @@ This repository is actively being developed into a full detection engineering pl
 
 ## License
 
-Add your preferred license here.
+This repository is licensed under the MIT License. See [LICENSE](LICENSE).
