@@ -2,7 +2,16 @@
 
 A centralized repository for building, governing, validating, and reporting on a modern detection engineering program.
 
-This repository is designed to serve as a one-stop location for:
+[![Executive Docs](https://img.shields.io/badge/Executive-Docs-blue)](docs/00_executive/)
+[![Strategy](https://img.shields.io/badge/Strategy-Program-purple)](docs/01_strategy/)
+[![Process](https://img.shields.io/badge/Process-Workflows-orange)](docs/02_process/)
+[![Visuals](https://img.shields.io/badge/Visuals-Reports%20%26%20Diagrams-teal)](docs/03_visuals/)
+[![Reporting](https://img.shields.io/badge/Reporting-Metrics%20%26%20Reviews-green)](docs/04_reporting/)
+[![Detections](https://img.shields.io/badge/Detections-Sentinel-red)](detections/sentinel/)
+[![Governance](https://img.shields.io/badge/Governance-Standards-darkgreen)](governance/)
+[![Triage Guides](https://img.shields.io/badge/Triage-Guides-darkblue)](content/triage-guides/)
+
+This repository serves as a one-stop location for:
 - detection engineering strategy and program documentation
 - executive proposal and maturity reporting
 - detection-as-code content for Microsoft Sentinel
@@ -17,9 +26,45 @@ This repository is designed to serve as a one-stop location for:
 
 Detection engineering is more than writing alert logic. A mature program requires structure, governance, testing, reporting, and a repeatable process for turning threat hypotheses into reliable security analytics.
 
-This repository brings those pieces together in a single platform so the program can be managed like an engineering discipline rather than a loose collection of rules.
+## Start Here
 
----
+This repository is organized to support leadership, detection engineers, and SOC/IR stakeholders from a single location.
+
+### Leadership
+Start here for program intent, maturity, and reporting:
+- [Executive Documents](docs/00_executive/)
+- [Program Charter](docs/00_executive/program-charter.md)
+- [Roadmap](docs/00_executive/roadmap.md)
+- [Mission](docs/01_strategy/mission.md)
+- [Scope](docs/01_strategy/scope.md)
+- [Maturity Model](docs/01_strategy/maturity-model.md)
+- [Metrics Catalog](docs/04_reporting/metrics-catalog.md)
+- [Quarterly Program Review Template](docs/04_reporting/quarterly-program-review-template.md)
+- [Annual Roadmap Review](docs/04_reporting/annual-roadmap-review.md)
+- [Gap Analysis](docs/04_reporting/gap-analysis.md)
+
+### Detection Engineers
+Start here for content development, standards, and rule management:
+- [Sentinel Detections](detections/sentinel/)
+- [Governance Standards](governance/)
+- [Operating Model](docs/01_strategy/operating-model.md)
+- [Detection Lifecycle](docs/02_process/detection-lifecycle.md)
+- [Intake Workflow](docs/02_process/intake-workflow.md)
+- [QA and Validation Standard](docs/02_process/qa-validation-standard.md)
+- [Tuning Standard](docs/02_process/tuning-standard.md)
+- [Detection Rule Template](content/templates/detection-rule-template.yml)
+- [Validation Checklist](content/templates/validation-checklist.md)
+- [Detection Tracking Matrix](docs/04_reporting/detection_tracking_matrix.csv)
+
+### SOC / Incident Response
+Start here for triage support, process context, and coverage visibility:
+- [Triage Guides](content/triage-guides/)
+- [Priority Starter Triage Guides](content/triage-guides/priority-starter-rules/)
+- [Detection Lifecycle](docs/02_process/detection-lifecycle.md)
+- [Exception Management](docs/02_process/exception-management.md)
+- [Change Control](docs/02_process/change-control.md)
+- [Coverage](coverage/)
+- [Visuals](docs/03_visuals/)
 
 ## Repository Objectives
 
@@ -35,8 +80,6 @@ This repository supports the full detection engineering lifecycle:
 8. Report value to SOC leadership and executive stakeholders
 
 ---
-
-## Repository Structure
 
 ## Executive Documents
 
