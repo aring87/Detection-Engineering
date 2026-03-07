@@ -38,6 +38,28 @@ This repository supports the full detection engineering lifecycle:
 
 ## Repository Structure
 
+## Executive Documents
+
+This repository includes executive and program-level documentation to support leadership visibility, roadmap planning, and detection engineering program maturity.
+
+### Core Executive Artifacts
+- [Detection Engineering Proposal (DOCX)](docs/00_executive/detection-engineering-proposal.docx)
+- [Detection Engineering Proposal (PDF)](docs/00_executive/detection-engineering-proposal.pdf)
+- [Program Charter](docs/00_executive/program-charter.md)
+- [Roadmap](docs/00_executive/roadmap.md)
+
+### Strategy
+- [Mission](docs/01_strategy/mission.md)
+- [Scope](docs/01_strategy/scope.md)
+- [Maturity Model](docs/01_strategy/maturity-model.md)
+- [Operating Model](docs/01_strategy/operating-model.md)
+
+### Reporting
+- [Metrics Catalog](docs/04_reporting/metrics-catalog.md)
+- [Quarterly Program Review Template](docs/04_reporting/quarterly-program-review-template.md)
+- [Annual Roadmap Review](docs/04_reporting/annual-roadmap-review.md)
+- [Gap Analysis](docs/04_reporting/gap-analysis.md)
+
 ### Executive and program documentation
 - `docs/00_executive/` — executive summary, proposal, charter, roadmap
 - `docs/01_strategy/` — mission, scope, operating model, maturity model
