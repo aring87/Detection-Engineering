@@ -57,10 +57,12 @@ Start here for content development, standards, and rule management:
 - [Detection Tracking Matrix](docs/04_reporting/detection_tracking_matrix.csv)
 
 ### SOC / Incident Response
-Start here for triage support, process context, and coverage visibility:
+Start here for triage support, process context, escalation guidance, and coverage visibility:
 - [Triage Guides](content/triage-guides/)
 - [Priority Starter Triage Guides](content/triage-guides/priority-starter-rules/)
-- [Detection Lifecycle](docs/02_process/detection-lifecycle.md)
+- [SOC and Incident Response Alignment](docs/02_process/soc-incident-response-alignment.md)
+- [Alert Escalation Guidance](docs/02_process/alert-escalation-guidance.md)
+- [Detection Feedback Loop](docs/02_process/detection-feedback-loop.md)
 - [Exception Management](docs/02_process/exception-management.md)
 - [Change Control](docs/02_process/change-control.md)
 - [Coverage](coverage/)
